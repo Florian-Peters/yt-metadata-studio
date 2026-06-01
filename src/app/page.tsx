@@ -85,8 +85,16 @@ export default function Home() {
               <div>
                 <h2 className="text-xl font-black text-stone-950">Generated output</h2>
                 <p className="text-sm leading-6 text-stone-700">
-                  Active preset: <span className="font-semibold text-teal-900">{selectedPreset.name}</span>
+                  Selected preset: <span className="font-semibold text-teal-900">{selectedPreset.name}</span>
                 </p>
+                {metadata ? (
+                  <p className="text-sm leading-6 text-stone-600">
+                    Output generated for:{" "}
+                    <span className="font-semibold">
+                      {metadata.presetName} / {metadata.videoType} / {metadata.language}
+                    </span>
+                  </p>
+                ) : null}
               </div>
               <span className="w-fit rounded-md bg-stone-900 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-white">
                 Local only

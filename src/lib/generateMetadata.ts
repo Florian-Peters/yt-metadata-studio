@@ -10,6 +10,9 @@ export type MetadataFormValues = {
 };
 
 export type GeneratedMetadata = {
+  presetName: string;
+  videoType: VideoType;
+  language: Language;
   titles: string[];
   fullDescription: string;
   shortDescription: string;
@@ -24,21 +27,6 @@ const titlePatterns = [
   "{keyword}: {title}",
   "{title} ({languageHook})",
   "{tone} {keyword} for {storyShort}",
-];
-
-const descriptionOpeners = [
-  "Step into",
-  "Experience",
-  "Discover",
-  "Enter",
-  "Watch",
-];
-
-const ctas = [
-  "Subscribe for more releases, creator drops and new visual stories.",
-  "Like, comment and follow the channel for the next upload.",
-  "Save this video if the mood fits your playlist or project inspiration.",
-  "Share it with someone who would connect with this style.",
 ];
 
 const captionStarters = [
@@ -64,6 +52,8 @@ function rotate<T>(items: T[], seed: number): T[] {
 
 function toHashtag(value: string): string {
   const tag = value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/&/g, " and ")
     .replace(/[^a-zA-Z0-9\s-]/g, "")
     .split(/[\s-]+/)
@@ -72,6 +62,19 @@ function toHashtag(value: string): string {
     .join("");
 
   return `#${tag || "CreatorVideo"}`;
+}
+
+function smartTrim(value: string, maxLength: number): string {
+  const clean = value.trim();
+
+  if (clean.length <= maxLength) {
+    return clean;
+  }
+
+  const trimmed = clean.slice(0, maxLength - 1).trim();
+  const lastSpace = trimmed.lastIndexOf(" ");
+
+  return `${(lastSpace > 14 ? trimmed.slice(0, lastSpace) : trimmed).trim()}...`;
 }
 
 function languageHook(language: Language): string {
@@ -98,6 +101,52 @@ function descriptionLanguageLine(language: Language): string {
   return "Language: English.";
 }
 
+function localizedCopy(language: Language) {
+  if (language === "German") {
+    return {
+      opener: "Erlebe",
+      stylePrefix: "Stil",
+      audiencePrefix: "Geeignet fuer",
+      cta: "Abonniere den Kanal fuer weitere Uploads, neue Releases und kreative Stories.",
+      shortPrefix: "Neu",
+    };
+  }
+
+  if (language === "Mixed") {
+    return {
+      opener: "Experience / Erlebe",
+      stylePrefix: "Style / Stil",
+      audiencePrefix: "Made for / Geeignet fuer",
+      cta: "Subscribe und folge dem Kanal fuer more releases, Shorts und neue kreative Uploads.",
+      shortPrefix: "New / Neu",
+    };
+  }
+
+  return {
+    opener: "Experience",
+    stylePrefix: "Style",
+    audiencePrefix: "Made for",
+    cta: "Subscribe for more releases, creator drops and new visual stories.",
+    shortPrefix: "New",
+  };
+}
+
+function presetAudienceLine(presetId: PresetId): string {
+  if (presetId === "neon-hunter-nova") {
+    return "fans of cinematic cyberpunk, dark pop, electropop, anime-inspired visuals and game-inspired worlds";
+  }
+
+  if (presetId === "nelfij") {
+    return "listeners who enjoy emotional anime-inspired, manga-inspired and fanmade original music";
+  }
+
+  if (presetId === "bambinibeats") {
+    return "kids, parents and families looking for warm learning songs, simple games and sing-along moments";
+  }
+
+  return "creators, viewers and fans of clear, useful and engaging online videos";
+}
+
 function distinctKeyword(keywords: string[], mood: MoodStyle, index: number): string {
   const keyword = keywords[index % keywords.length];
 
@@ -119,14 +168,13 @@ export function generateMetadata(values: MetadataFormValues, variant = 0): Gener
   const preset = getPresetById(values.presetId);
   const title = cleanInput(values.title, "Untitled Release");
   const story = cleanInput(values.story, "a new creative story");
-  const storyShort = story.length > 44 ? `${story.slice(0, 41).trim()}...` : story;
+  const storyShort = smartTrim(story, 48);
   const keywords = rotate(preset.keywords, variant);
   const tones = rotate(preset.toneWords, variant + 1);
-  const opener = pick(descriptionOpeners, variant);
-  const cta = pick(ctas, variant + values.videoType.length);
+  const copy = localizedCopy(values.language);
 
-  const titles = titlePatterns.map((pattern, index) =>
-    enforceAvoidWords(
+  const titles = Array.from(new Set(titlePatterns.map((pattern, index) =>
+    smartTrim(enforceAvoidWords(
       pattern
         .replace("{title}", title)
         .replace("{mood}", values.mood)
@@ -136,25 +184,28 @@ export function generateMetadata(values: MetadataFormValues, variant = 0): Gener
         .replace("{languageHook}", languageHook(values.language))
         .replace("{storyShort}", storyShort),
       preset.avoidWords,
-    ),
-  );
+    ), 92),
+  ))).slice(0, 5);
 
   const fullDescription = enforceAvoidWords(
     [
-      `${opener} "${title}", a ${values.mood} ${values.videoType.toLowerCase()} shaped for ${preset.name}.`,
+      `${copy.opener} "${title}" - a ${values.mood} ${values.videoType.toLowerCase()} shaped for ${preset.name}.`,
       "",
-      `${story}`,
+      story,
       "",
-      `Style notes: ${keywords.slice(0, 5).join(", ")}. The wording keeps the upload ${tones.slice(0, 3).join(", ")} and aligned with the channel preset.`,
+      `${copy.stylePrefix}: ${keywords.slice(0, 5).join(", ")}. The upload is positioned as ${tones.slice(0, 3).join(", ")} and aligned with this channel preset.`,
+      `${copy.audiencePrefix}: ${presetAudienceLine(preset.id)}.`,
       `${descriptionLanguageLine(values.language)} Format: ${values.videoType}.`,
       "",
-      cta,
+      copy.cta,
+      "",
+      keywords.slice(0, 5).map(toHashtag).join(" "),
     ].join("\n"),
     preset.avoidWords,
   );
 
   const shortDescription = enforceAvoidWords(
-    `${values.mood} ${distinctKeyword(keywords, values.mood, 0)}: ${title}`.slice(0, 99),
+    smartTrim(`${copy.shortPrefix}: ${values.mood} ${distinctKeyword(keywords, values.mood, 0)} - ${title}`, 99),
     preset.avoidWords,
   );
 
@@ -170,8 +221,8 @@ export function generateMetadata(values: MetadataFormValues, variant = 0): Gener
   const hashtags = Array.from(new Set(hashtagSource.map(toHashtag))).slice(0, 10);
 
   const thumbnailTexts = [
-    title.length <= 24 ? title : title.split(" ").slice(0, 4).join(" "),
-    `${tones[0].toUpperCase()} ${keywords[0].toUpperCase()}`,
+    smartTrim(title, 26),
+    smartTrim(`${tones[0].toUpperCase()} ${keywords[0].toUpperCase()}`, 26),
     values.videoType === "Kids Song" ? "SING & LEARN" : `${values.mood.toUpperCase()} DROP`,
   ].map((text) => enforceAvoidWords(text, preset.avoidWords));
 
@@ -183,6 +234,9 @@ export function generateMetadata(values: MetadataFormValues, variant = 0): Gener
   );
 
   return {
+    presetName: preset.name,
+    videoType: values.videoType,
+    language: values.language,
     titles,
     fullDescription,
     shortDescription,

@@ -17,8 +17,8 @@ export function OutputCard({ title, content }: OutputCardProps) {
 
       {Array.isArray(content) ? (
         <ul className="space-y-2">
-          {content.map((item) => (
-            <li key={item} className="rounded-md bg-stone-50 px-3 py-2 text-sm leading-6 text-stone-800">
+          {content.map((item, index) => (
+            <li key={`${title}-${index}-${item}`} className="rounded-md bg-stone-50 px-3 py-2 text-sm leading-6 text-stone-800">
               {item}
             </li>
           ))}

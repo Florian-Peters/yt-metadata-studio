@@ -1,6 +1,6 @@
 # yt-metadata-studio
 
-yt-metadata-studio is a local-first creator tool for generating YouTube and social media metadata for music and video uploads. It helps creators turn a video idea into titles, descriptions, hashtags, thumbnail text, Shorts-style wording and TikTok captions using reusable channel presets.
+yt-metadata-studio is a local-first creator tool for generating YouTube and social media metadata for music and video uploads. It helps creators turn a video idea into titles, descriptions, hashtags, thumbnail text, Shorts-style wording and TikTok captions using reusable channel presets. The MVP runs fully in the browser, so no backend, database or API key is required.
 
 ## Features
 
@@ -16,7 +16,7 @@ yt-metadata-studio is a local-first creator tool for generating YouTube and soci
 
 ## Screenshots
 
-Add screenshots here after your first local run.
+Replace this placeholder with a screenshot after your first local run.
 
 ```md
 ![Dashboard screenshot](./docs/screenshot-dashboard.png)
@@ -35,7 +35,7 @@ Add screenshots here after your first local run.
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/your-username/yt-metadata-studio.git
+git clone https://github.com/Florian-Peters/yt-metadata-studio.git
 cd yt-metadata-studio
 npm install
 ```
@@ -63,6 +63,17 @@ http://localhost:3000
 7. Click **Regenerate** to create a slightly different wording pass.
 
 The MVP is fully local. It does not send prompts, titles or generated metadata to a backend service.
+
+## Available Scripts
+
+```bash
+npm run dev
+npm run lint
+npm run typecheck
+npm run build
+```
+
+Use `npm run build` before publishing a release because it runs the Next.js production build and validates the app route.
 
 ## Project Structure
 
