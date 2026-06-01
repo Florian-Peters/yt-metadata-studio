@@ -1,8 +1,10 @@
-export type PresetId =
+export type BuiltInPresetId =
   | "neon-hunter-nova"
   | "nelfij"
   | "bambinibeats"
   | "generic-creator";
+
+export type PresetId = BuiltInPresetId | `custom-${string}`;
 
 export type VideoType =
   | "Long Video"
@@ -28,7 +30,17 @@ export type Preset = {
   rules: string[];
   keywords: string[];
   toneWords: string[];
+  preferredWords?: string[];
   avoidWords?: string[];
+  source: "built-in" | "custom";
+};
+
+export type CustomPresetInput = {
+  name: string;
+  description: string;
+  toneKeywords: string;
+  forbiddenWords: string;
+  preferredWords: string;
 };
 
 export const presets: Preset[] = [
@@ -52,7 +64,9 @@ export const presets: Preset[] = [
       "game-inspired",
     ],
     toneWords: ["neon-lit", "futuristic", "shadowy", "high-energy", "cinematic"],
+    preferredWords: ["cinematic", "cyberpunk", "dark pop", "electropop", "original music"],
     avoidWords: ["AI", "KI"],
+    source: "built-in",
   },
   {
     id: "nelfij",
@@ -75,6 +89,8 @@ export const presets: Preset[] = [
       "battle theme",
     ],
     toneWords: ["emotional", "adventurous", "cinematic", "heroic", "heartfelt"],
+    preferredWords: ["fanmade", "original music", "anime-inspired", "cinematic", "emotional"],
+    source: "built-in",
   },
   {
     id: "bambinibeats",
@@ -97,6 +113,9 @@ export const presets: Preset[] = [
       "sing along",
     ],
     toneWords: ["warm", "simple", "playful", "safe", "cheerful"],
+    preferredWords: ["kids song", "learning", "sing along", "family friendly", "numbers"],
+    avoidWords: ["scary", "violent", "dark", "horror"],
+    source: "built-in",
   },
   {
     id: "generic-creator",
@@ -117,6 +136,8 @@ export const presets: Preset[] = [
       "social media",
     ],
     toneWords: ["clear", "engaging", "modern", "direct", "useful"],
+    preferredWords: ["new video", "creator", "shorts", "tutorial", "music"],
+    source: "built-in",
   },
 ];
 
@@ -139,6 +160,36 @@ export const moodStyles: MoodStyle[] = [
   "kid-friendly",
 ];
 
-export function getPresetById(id: PresetId): Preset {
-  return presets.find((preset) => preset.id === id) ?? presets[0];
+export function getPresetById(id: PresetId, availablePresets: Preset[] = presets): Preset {
+  return availablePresets.find((preset) => preset.id === id) ?? availablePresets[0] ?? presets[0];
+}
+
+export function parsePresetWords(value: string): string[] {
+  return value
+    .split(/[,;\n]/)
+    .map((word) => word.trim())
+    .filter(Boolean);
+}
+
+export function createCustomPreset(input: CustomPresetInput): Preset {
+  const name = input.name.trim() || "Custom Preset";
+  const toneWords = parsePresetWords(input.toneKeywords);
+  const preferredWords = parsePresetWords(input.preferredWords);
+  const avoidWords = parsePresetWords(input.forbiddenWords);
+
+  return {
+    id: `custom-${Date.now().toString(36)}`,
+    name,
+    tagline: input.description.trim() || "Custom local creator preset.",
+    rules: [
+      input.description.trim() || "Use the creator's custom channel wording.",
+      preferredWords.length > 0 ? `Prefer: ${preferredWords.join(", ")}.` : "Use clear creator-friendly wording.",
+      avoidWords.length > 0 ? `Avoid: ${avoidWords.join(", ")}.` : "Avoid misleading or off-brand wording.",
+    ],
+    keywords: preferredWords.length > 0 ? preferredWords : ["creator", "new video", "original content"],
+    toneWords: toneWords.length > 0 ? toneWords : ["clear", "consistent", "engaging"],
+    preferredWords,
+    avoidWords,
+    source: "custom",
+  };
 }

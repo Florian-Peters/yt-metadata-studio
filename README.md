@@ -1,8 +1,12 @@
 # yt-metadata-studio
 
-A local-first metadata generator for YouTube creators, music projects, Shorts and TikTok captions.
+Local-first YouTube metadata generator for creators, music projects, Shorts and TikTok captions.
 
-yt-metadata-studio helps creators turn a rough video idea into publish-ready metadata: title ideas, descriptions, hashtags, thumbnail text and short-form captions. It is built around reusable channel presets, so each project can keep a consistent tone without needing a backend, database or paid API.
+yt-metadata-studio helps creators turn a rough upload idea into a complete metadata pack: YouTube titles, full descriptions, short descriptions, hashtags, thumbnail text and short-form captions. It is built around reusable presets so music projects, kids channels and general creators can keep consistent wording without a backend, login or paid API.
+
+## Live Demo
+
+Coming soon.
 
 ## GitHub Description
 
@@ -15,23 +19,27 @@ Local-first YouTube metadata generator for creators, music projects, Shorts and 
 ## Features
 
 - Generate 5 YouTube title ideas from one creator brief
-- Create a full YouTube description plus a short description under 100 characters
-- Generate 10 hashtags, 3 thumbnail text ideas and 3 TikTok captions
-- Use channel presets for consistent wording and positioning
-- Included presets: Neon Hunter Nova, Nelfij, BambiniBeats and Generic Creator
+- Create a full YouTube description and a short description under 100 characters
+- Generate 10 clean hashtags, 3 thumbnail text ideas and 3 TikTok captions
+- Use built-in presets for Neon Hunter Nova, Nelfij, BambiniBeats and Generic Creator
+- Create custom presets with preferred words, forbidden words and tone keywords
+- Save custom presets in localStorage
+- Delete custom presets without affecting built-in presets
 - Copy individual output blocks or copy the complete metadata pack
+- Export the current metadata pack as `.txt` or `.md`
+- Show a simple local Metadata Score with improvement tips
 - Regenerate alternate wording without changing the input
-- Runs fully in the browser for the MVP
-- No backend, database, account system or paid API required
+- Fully local-first MVP: no backend, database, authentication or external generation API
 - Responsive dashboard layout for desktop and mobile
 
 ## Screenshots
 
-Add product screenshots here after running the app locally.
+Add screenshots after running the app locally.
 
 ```md
-![yt-metadata-studio dashboard](./docs/screenshot-dashboard.png)
-![Generated metadata example](./docs/screenshot-output.png)
+![Dashboard](./docs/screenshot-dashboard.png)
+![Generated metadata](./docs/screenshot-output.png)
+![Custom preset form](./docs/screenshot-custom-preset.png)
 ```
 
 ## Example Output
@@ -51,25 +59,22 @@ Generated sample:
 
 ```text
 YouTube title ideas
-1. Neon Skyline Chase | cinematic cyberpunk
-2. Neon Skyline Chase - shadowy Music Video
+1. Neon Skyline Chase | cyberpunk
+2. Neon Skyline Chase - shadowy cinematic cyberpunk original music
 3. dark pop: Neon Skyline Chase
 4. Neon Skyline Chase (Official Video)
-5. neon-lit futuristic music for A futuristic chase through a rainy...
+5. cinematic cyberpunk original music - A futuristic chase through a rainy...
 
 Short YouTube description
-New: cinematic cyberpunk - Neon Skyline Chase
+New: cinematic cyberpunk original music - Neon Skyline Chase
 
 Hashtags
-#NeonSkylineChase #MusicVideo #Cinematic #English #NeonHunterNova #Cyberpunk #DarkPop #Electropop #FuturisticMusic #OriginalMusic
+#NeonSkylineChase #MusicVideo #Cinematic #English #NeonHunterNova #Cyberpunk #DarkPop #Electropop #OriginalMusic #FuturisticMusic
 
 Thumbnail text ideas
-NEON SKYLINE CHASE
+Neon Skyline Chase
 FUTURISTIC CYBERPUNK
 CINEMATIC DROP
-
-TikTok caption idea
-New drop: Neon Skyline Chase - futuristic cyberpunk. #MusicVideo
 ```
 
 ## Tech Stack
@@ -78,7 +83,7 @@ New drop: Neon Skyline Chase - futuristic cyberpunk. #MusicVideo
 - React
 - TypeScript
 - Tailwind CSS
-- Local browser state
+- Browser localStorage
 
 ## Installation
 
@@ -100,13 +105,13 @@ Install dependencies:
 npm install
 ```
 
-Start the development server:
+Run the local development server:
 
 ```bash
 npm run dev
 ```
 
-Open the app:
+Open:
 
 ```text
 http://localhost:3000
@@ -114,15 +119,16 @@ http://localhost:3000
 
 ## Usage
 
-1. Enter a video or song title.
-2. Describe the main topic, story or creative angle.
-3. Choose a channel/project preset.
-4. Select the video type, language and mood.
+1. Enter the video or song title.
+2. Describe the topic, story or creative angle.
+3. Select a built-in preset or create a custom preset.
+4. Choose video type, language and mood/style.
 5. Click **Generate metadata**.
-6. Copy individual output sections or use **Copy All**.
-7. Click **Regenerate** to create a different wording pass.
+6. Review the Metadata Score and improvement tips.
+7. Copy sections, use **Copy All**, or export as TXT/Markdown.
+8. Click **Regenerate** for another wording pass.
 
-The MVP is local-only. It does not send titles, prompts or generated metadata to an external service.
+All generation is template-based and local. The app does not send prompts, titles, custom presets or generated metadata to external services.
 
 ## Available Scripts
 
@@ -133,40 +139,53 @@ npm run typecheck
 npm run build
 ```
 
-Use `npm run build` before publishing changes. It runs the production build and validates the Next.js app route.
-
 ## Project Structure
 
 ```text
 src/
   app/
-    globals.css
-    layout.tsx
-    page.tsx
   components/
-    CopyButton.tsx
-    MetadataForm.tsx
-    OutputCard.tsx
-    PresetSelector.tsx
   data/
-    presets.ts
   lib/
-    generateMetadata.ts
+.github/
+  ISSUE_TEMPLATE/
+  workflows/
 ```
 
 ## Roadmap
 
-- Save custom channel presets in local storage
-- Export metadata packs as `.txt` or `.md`
-- Add optional OpenAI API support for advanced generations
-- Add generation history
-- Add YouTube SEO scoring
-- Add thumbnail prompt generator
+- Save named generation history
 - Add preset import/export
+- Add thumbnail prompt generator
+- Add optional OpenAI API support
+- Add YouTube SEO scoring improvements
+- Add more creator preset examples
 
 ## Contributing
 
-This is an MVP, so focused improvements are welcome: better preset wording, more useful generation templates, accessibility fixes and small UX improvements. Keep changes lightweight and avoid adding backend requirements unless they are optional.
+Contributions are welcome. Good areas to improve are preset wording, generator templates, accessibility, documentation and small UX refinements.
+
+Before opening a pull request:
+
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
+
+Keep the project local-first and beginner-friendly. Avoid adding required backend services, authentication or paid APIs.
+
+## Release Checklist
+
+- [ ] `npm install`
+- [ ] `npm run lint`
+- [ ] `npm run typecheck`
+- [ ] `npm run build`
+- [ ] Test generation with a built-in preset
+- [ ] Test custom preset creation, reload persistence and deletion
+- [ ] Test Copy All and individual copy buttons
+- [ ] Test TXT and Markdown export
+- [ ] Review README screenshots and changelog
 
 ## License
 

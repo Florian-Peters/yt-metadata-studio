@@ -1,4 +1,4 @@
-import { getPresetById, type Language, type MoodStyle, type PresetId, type VideoType } from "@/data/presets";
+import { getPresetById, type Language, type MoodStyle, type Preset, type PresetId, type VideoType } from "@/data/presets";
 
 export type MetadataFormValues = {
   title: string;
@@ -22,11 +22,12 @@ export type GeneratedMetadata = {
 };
 
 const titlePatterns = [
-  "{title} | {mood} {keyword}",
-  "{title} - {tone} {videoType}",
+  "{title} | {keyword}",
+  "{title} - {tone} {hook}",
   "{keyword}: {title}",
   "{title} ({languageHook})",
-  "{tone} {keyword} for {storyShort}",
+  "{hook} - {storyShort}",
+  "{title} | {tone} {videoType}",
 ];
 
 const captionStarters = [
@@ -61,7 +62,7 @@ function toHashtag(value: string): string {
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join("");
 
-  return `#${tag || "CreatorVideo"}`;
+  return `#${tag.slice(0, 40) || "CreatorVideo"}`;
 }
 
 function smartTrim(value: string, maxLength: number): string {
@@ -131,7 +132,13 @@ function localizedCopy(language: Language) {
   };
 }
 
-function presetAudienceLine(presetId: PresetId): string {
+function presetAudienceLine(preset: Preset): string {
+  if (preset.source === "custom") {
+    return preset.tagline.toLowerCase();
+  }
+
+  const presetId = preset.id;
+
   if (presetId === "neon-hunter-nova") {
     return "fans of cinematic cyberpunk, dark pop, electropop, anime-inspired visuals and game-inspired worlds";
   }
@@ -147,6 +154,26 @@ function presetAudienceLine(presetId: PresetId): string {
   return "creators, viewers and fans of clear, useful and engaging online videos";
 }
 
+function presetHook(preset: Preset, mood: MoodStyle, keyword: string): string {
+  if (preset.id === "neon-hunter-nova") {
+    return `${mood} cyberpunk original music`;
+  }
+
+  if (preset.id === "nelfij") {
+    return `${mood} anime-inspired fanmade music`;
+  }
+
+  if (preset.id === "bambinibeats") {
+    return "safe kids learning song";
+  }
+
+  if (preset.source === "custom") {
+    return `${mood} ${keyword}`;
+  }
+
+  return `${mood} creator video`;
+}
+
 function distinctKeyword(keywords: string[], mood: MoodStyle, index: number): string {
   const keyword = keywords[index % keywords.length];
 
@@ -157,21 +184,27 @@ function distinctKeyword(keywords: string[], mood: MoodStyle, index: number): st
   return keywords[(index + 1) % keywords.length];
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function enforceAvoidWords(text: string, avoidWords: string[] = []): string {
   return avoidWords.reduce((current, word) => {
-    const pattern = new RegExp(`\\b${word}\\b`, "gi");
+    const pattern = new RegExp(`\\b${escapeRegExp(word)}\\b`, "gi");
     return current.replace(pattern, "original");
   }, text);
 }
 
-export function generateMetadata(values: MetadataFormValues, variant = 0): GeneratedMetadata {
-  const preset = getPresetById(values.presetId);
+export function generateMetadata(values: MetadataFormValues, variant = 0, availablePresets?: Preset[]): GeneratedMetadata {
+  const preset = getPresetById(values.presetId, availablePresets);
   const title = cleanInput(values.title, "Untitled Release");
   const story = cleanInput(values.story, "a new creative story");
   const storyShort = smartTrim(story, 48);
-  const keywords = rotate(preset.keywords, variant);
+  const keywordPool = Array.from(new Set([...(preset.preferredWords ?? []), ...preset.keywords]));
+  const keywords = rotate(keywordPool, variant);
   const tones = rotate(preset.toneWords, variant + 1);
   const copy = localizedCopy(values.language);
+  const hook = presetHook(preset, values.mood, distinctKeyword(keywords, values.mood, 0));
 
   const titles = Array.from(new Set(titlePatterns.map((pattern, index) =>
     smartTrim(enforceAvoidWords(
@@ -180,6 +213,7 @@ export function generateMetadata(values: MetadataFormValues, variant = 0): Gener
         .replace("{mood}", values.mood)
         .replace("{keyword}", distinctKeyword(keywords, values.mood, index))
         .replace("{tone}", tones[index % tones.length])
+        .replace("{hook}", hook)
         .replace("{videoType}", values.videoType)
         .replace("{languageHook}", languageHook(values.language))
         .replace("{storyShort}", storyShort),
@@ -189,12 +223,12 @@ export function generateMetadata(values: MetadataFormValues, variant = 0): Gener
 
   const fullDescription = enforceAvoidWords(
     [
-      `${copy.opener} "${title}" - a ${values.mood} ${values.videoType.toLowerCase()} shaped for ${preset.name}.`,
+      `${copy.opener} "${title}" - a ${hook} shaped for ${preset.name}.`,
       "",
-      story,
+      `${story} This metadata pack positions the upload clearly for viewers while keeping the channel tone consistent.`,
       "",
-      `${copy.stylePrefix}: ${keywords.slice(0, 5).join(", ")}. The upload is positioned as ${tones.slice(0, 3).join(", ")} and aligned with this channel preset.`,
-      `${copy.audiencePrefix}: ${presetAudienceLine(preset.id)}.`,
+      `${copy.stylePrefix}: ${keywords.slice(0, 5).join(", ")}. The wording stays ${tones.slice(0, 3).join(", ")} and focused on the most searchable creator terms.`,
+      `${copy.audiencePrefix}: ${presetAudienceLine(preset)}.`,
       `${descriptionLanguageLine(values.language)} Format: ${values.videoType}.`,
       "",
       copy.cta,
@@ -204,9 +238,9 @@ export function generateMetadata(values: MetadataFormValues, variant = 0): Gener
     preset.avoidWords,
   );
 
-  const shortDescription = enforceAvoidWords(
-    smartTrim(`${copy.shortPrefix}: ${values.mood} ${distinctKeyword(keywords, values.mood, 0)} - ${title}`, 99),
-    preset.avoidWords,
+  const shortDescription = smartTrim(
+    enforceAvoidWords(`${copy.shortPrefix}: ${hook} - ${title}`, preset.avoidWords),
+    99,
   );
 
   const hashtagSource = [
@@ -218,12 +252,14 @@ export function generateMetadata(values: MetadataFormValues, variant = 0): Gener
     ...keywords,
   ];
 
-  const hashtags = Array.from(new Set(hashtagSource.map(toHashtag))).slice(0, 10);
+  const hashtags = Array.from(new Set(hashtagSource.map((tag) => toHashtag(enforceAvoidWords(tag, preset.avoidWords)))))
+    .filter((tag) => tag.length > 1)
+    .slice(0, 10);
 
   const thumbnailTexts = [
     smartTrim(title, 26),
     smartTrim(`${tones[0].toUpperCase()} ${keywords[0].toUpperCase()}`, 26),
-    values.videoType === "Kids Song" ? "SING & LEARN" : `${values.mood.toUpperCase()} DROP`,
+    preset.id === "bambinibeats" || values.videoType === "Kids Song" ? "SING & LEARN" : `${values.mood.toUpperCase()} DROP`,
   ].map((text) => enforceAvoidWords(text, preset.avoidWords));
 
   const tiktokCaptions = [0, 1, 2].map((offset) =>

@@ -1,6 +1,6 @@
 "use client";
 
-import { languages, moodStyles, videoTypes, type PresetId } from "@/data/presets";
+import { languages, moodStyles, videoTypes, type Preset, type PresetId } from "@/data/presets";
 import type { MetadataFormValues } from "@/lib/generateMetadata";
 import { PresetSelector } from "@/components/PresetSelector";
 
@@ -9,6 +9,8 @@ type MetadataFormProps = {
   onChange: (values: MetadataFormValues) => void;
   onGenerate: () => void;
   onRegenerate: () => void;
+  presets: Preset[];
+  onDeleteCustomPreset: (value: PresetId) => void;
   hasOutput: boolean;
 };
 
@@ -17,6 +19,8 @@ export function MetadataForm({
   onChange,
   onGenerate,
   onRegenerate,
+  presets,
+  onDeleteCustomPreset,
   hasOutput,
 }: MetadataFormProps) {
   function update<K extends keyof MetadataFormValues>(key: K, value: MetadataFormValues[K]) {
@@ -58,7 +62,12 @@ export function MetadataForm({
         />
       </div>
 
-      <PresetSelector value={values.presetId} onChange={(presetId: PresetId) => update("presetId", presetId)} />
+      <PresetSelector
+        value={values.presetId}
+        presets={presets}
+        onChange={(presetId: PresetId) => update("presetId", presetId)}
+        onDeleteCustomPreset={onDeleteCustomPreset}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <SelectField

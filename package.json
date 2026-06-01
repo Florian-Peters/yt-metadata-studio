@@ -1,7 +1,30 @@
 {
   "name": "yt-metadata-studio",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0-rc.0",
+  "description": "Local-first YouTube metadata generator for creators, music projects, Shorts and TikTok captions.",
+  "private": false,
+  "license": "MIT",
+  "author": "Florian Peters",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Florian-Peters/yt-metadata-studio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Florian-Peters/yt-metadata-studio/issues"
+  },
+  "homepage": "https://github.com/Florian-Peters/yt-metadata-studio#readme",
+  "keywords": [
+    "youtube",
+    "metadata-generator",
+    "creator-tools",
+    "nextjs",
+    "typescript",
+    "tailwindcss",
+    "shorts",
+    "tiktok",
+    "music-creators",
+    "local-first"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
