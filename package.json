@@ -1,6 +1,6 @@
 {
   "name": "yt-metadata-studio",
-  "version": "0.2.0-rc.0",
+  "version": "0.2.1",
   "description": "Local-first YouTube metadata generator for creators, music projects, Shorts and TikTok captions.",
   "private": false,
   "license": "MIT",
@@ -20,9 +20,11 @@
     "nextjs",
     "typescript",
     "tailwindcss",
+    "content-creation",
+    "seo",
     "shorts",
     "tiktok",
-    "music-creators",
+    "open-source",
     "local-first"
   ],
   "scripts": {
