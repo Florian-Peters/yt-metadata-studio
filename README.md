@@ -6,7 +6,9 @@ yt-metadata-studio helps creators turn a rough upload idea into a complete metad
 
 ## Live Demo
 
-Coming soon.
+https://yt-metadata-studio.vercel.app/
+
+The app is deployed on Vercel and runs fully local-first in the browser.
 
 ## GitHub Description
 

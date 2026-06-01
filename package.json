@@ -12,7 +12,7 @@
   "bugs": {
     "url": "https://github.com/Florian-Peters/yt-metadata-studio/issues"
   },
-  "homepage": "https://github.com/Florian-Peters/yt-metadata-studio#readme",
+  "homepage": "https://yt-metadata-studio.vercel.app/",
   "keywords": [
     "youtube",
     "metadata-generator",
