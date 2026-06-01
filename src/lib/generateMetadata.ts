@@ -139,32 +139,80 @@ function presetAudienceLine(preset: Preset): string {
 
   const presetId = preset.id;
 
-  if (presetId === "neon-hunter-nova") {
+  if (presetId === "cinematic-music-artist") {
     return "fans of cinematic cyberpunk, dark pop, electropop, anime-inspired visuals and game-inspired worlds";
   }
 
-  if (presetId === "nelfij") {
+  if (presetId === "anime-fanmade-music") {
     return "listeners who enjoy emotional anime-inspired, manga-inspired and fanmade original music";
   }
 
-  if (presetId === "bambinibeats") {
+  if (presetId === "kids-learning-channel") {
     return "kids, parents and families looking for warm learning songs, simple games and sing-along moments";
+  }
+
+  if (presetId === "gaming-creator") {
+    return "players and fans looking for gameplay, walkthroughs, highlights, reactions or game music";
+  }
+
+  if (presetId === "tutorial-education") {
+    return "viewers looking for clear steps, practical lessons and searchable learning content";
+  }
+
+  if (presetId === "podcast-interview") {
+    return "listeners interested in conversations, guests, clips, topics and episode highlights";
+  }
+
+  if (presetId === "fitness-creator") {
+    return "viewers looking for workouts, routines, progress, calisthenics and healthy creator content";
+  }
+
+  if (presetId === "business-product") {
+    return "founders, teams and customers interested in product demos, launches, SaaS tools and explainers";
+  }
+
+  if (presetId === "shorts-tiktok-viral") {
+    return "short-form viewers who respond to quick hooks, punchy captions and high-retention clips";
   }
 
   return "creators, viewers and fans of clear, useful and engaging online videos";
 }
 
 function presetHook(preset: Preset, mood: MoodStyle, keyword: string): string {
-  if (preset.id === "neon-hunter-nova") {
+  if (preset.id === "cinematic-music-artist") {
     return `${mood} cyberpunk original music`;
   }
 
-  if (preset.id === "nelfij") {
+  if (preset.id === "anime-fanmade-music") {
     return `${mood} anime-inspired fanmade music`;
   }
 
-  if (preset.id === "bambinibeats") {
+  if (preset.id === "kids-learning-channel") {
     return "safe kids learning song";
+  }
+
+  if (preset.id === "gaming-creator") {
+    return `${mood} gaming ${keyword}`;
+  }
+
+  if (preset.id === "tutorial-education") {
+    return `clear ${keyword}`;
+  }
+
+  if (preset.id === "podcast-interview") {
+    return `${mood} podcast conversation`;
+  }
+
+  if (preset.id === "fitness-creator") {
+    return `${mood} fitness ${keyword}`;
+  }
+
+  if (preset.id === "business-product") {
+    return `clear product ${keyword}`;
+  }
+
+  if (preset.id === "shorts-tiktok-viral") {
+    return `punchy ${keyword}`;
   }
 
   if (preset.source === "custom") {
@@ -259,7 +307,7 @@ export function generateMetadata(values: MetadataFormValues, variant = 0, availa
   const thumbnailTexts = [
     smartTrim(title, 26),
     smartTrim(`${tones[0].toUpperCase()} ${keywords[0].toUpperCase()}`, 26),
-    preset.id === "bambinibeats" || values.videoType === "Kids Song" ? "SING & LEARN" : `${values.mood.toUpperCase()} DROP`,
+    preset.id === "kids-learning-channel" || values.videoType === "Kids Song" ? "SING & LEARN" : `${values.mood.toUpperCase()} DROP`,
   ].map((text) => enforceAvoidWords(text, preset.avoidWords));
 
   const tiktokCaptions = [0, 1, 2].map((offset) =>

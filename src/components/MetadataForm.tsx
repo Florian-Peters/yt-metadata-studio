@@ -43,7 +43,7 @@ export function MetadataForm({
           id="title"
           value={values.title}
           onChange={(event) => update("title", event.target.value)}
-          placeholder="Neon Skyline Chase"
+          placeholder="Midnight Skyline"
           className="w-full rounded-lg border border-stone-300 bg-white px-4 py-3 text-stone-950 outline-none transition placeholder:text-stone-400 focus:border-teal-800 focus:ring-2 focus:ring-teal-700/20"
         />
       </div>
@@ -56,7 +56,7 @@ export function MetadataForm({
           id="story"
           value={values.story}
           onChange={(event) => update("story", event.target.value)}
-          placeholder="A futuristic chase through a rainy city with emotional synth melodies."
+          placeholder="A cinematic upload about a rainy night drive with emotional synth melodies."
           rows={5}
           className="w-full resize-none rounded-lg border border-stone-300 bg-white px-4 py-3 text-stone-950 outline-none transition placeholder:text-stone-400 focus:border-teal-800 focus:ring-2 focus:ring-teal-700/20"
         />

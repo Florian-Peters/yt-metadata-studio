@@ -16,7 +16,7 @@ const customPresetsStorageKey = "yt-metadata-studio-custom-presets";
 const initialValues: MetadataFormValues = {
   title: "",
   story: "",
-  presetId: "neon-hunter-nova",
+  presetId: "cinematic-music-artist",
   videoType: "Music Video",
   language: "English",
   mood: "cinematic",

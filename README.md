@@ -2,7 +2,7 @@
 
 Local-first YouTube metadata generator for creators, music projects, Shorts and TikTok captions.
 
-yt-metadata-studio helps creators turn a rough upload idea into a complete metadata pack: YouTube titles, full descriptions, short descriptions, hashtags, thumbnail text and short-form captions. It is built around reusable presets so music projects, kids channels and general creators can keep consistent wording without a backend, login or paid API.
+yt-metadata-studio helps creators turn a rough upload idea into a complete metadata pack: YouTube titles, full descriptions, short descriptions, hashtags, thumbnail text and short-form captions. It ships with generic built-in presets for common creator workflows, and users can add their own local custom presets without a backend, login or paid API.
 
 ## Live Demo
 
@@ -23,7 +23,7 @@ Local-first YouTube metadata generator for creators, music projects, Shorts and 
 - Generate 5 YouTube title ideas from one creator brief
 - Create a full YouTube description and a short description under 100 characters
 - Generate 10 clean hashtags, 3 thumbnail text ideas and 3 TikTok captions
-- Use built-in presets for Neon Hunter Nova, Nelfij, BambiniBeats and Generic Creator
+- Use generic built-in presets for music, anime/fanmade, kids learning, gaming, tutorials, podcasts, fitness, business, short-form and general creator content
 - Create custom presets with preferred words, forbidden words and tone keywords
 - Save custom presets in localStorage
 - Delete custom presets without affecting built-in presets
@@ -51,7 +51,7 @@ Input:
 ```text
 Title: Neon Skyline Chase
 Story: A futuristic chase through a rainy city with emotional synth melodies and game-inspired visuals.
-Preset: Neon Hunter Nova
+Preset: Cinematic Music Artist
 Video type: Music Video
 Language: English
 Mood: cinematic
@@ -61,7 +61,7 @@ Generated sample:
 
 ```text
 YouTube title ideas
-1. Neon Skyline Chase | cyberpunk
+1. Neon Skyline Chase | cinematic
 2. Neon Skyline Chase - shadowy cinematic cyberpunk original music
 3. dark pop: Neon Skyline Chase
 4. Neon Skyline Chase (Official Video)
@@ -71,7 +71,7 @@ Short YouTube description
 New: cinematic cyberpunk original music - Neon Skyline Chase
 
 Hashtags
-#NeonSkylineChase #MusicVideo #Cinematic #English #NeonHunterNova #Cyberpunk #DarkPop #Electropop #OriginalMusic #FuturisticMusic
+#NeonSkylineChase #MusicVideo #Cinematic #English #CinematicMusicArtist #Cyberpunk #DarkPop #Electropop #OriginalMusic #FuturisticMusic
 
 Thumbnail text ideas
 Neon Skyline Chase
@@ -123,7 +123,7 @@ http://localhost:3000
 
 1. Enter the video or song title.
 2. Describe the topic, story or creative angle.
-3. Select a built-in preset or create a custom preset.
+3. Select a generic built-in preset or create a custom preset.
 4. Choose video type, language and mood/style.
 5. Click **Generate metadata**.
 6. Review the Metadata Score and improvement tips.
@@ -131,6 +131,21 @@ http://localhost:3000
 8. Click **Regenerate** for another wording pass.
 
 All generation is template-based and local. The app does not send prompts, titles, custom presets or generated metadata to external services.
+
+## Built-In Presets
+
+- Cinematic Music Artist
+- Anime / Fanmade Music
+- Kids Learning Channel
+- Gaming Creator
+- Tutorial / Education
+- Podcast / Interview
+- Fitness Creator
+- Business / Product
+- Shorts / TikTok Viral
+- Generic Creator
+
+Custom presets are saved in `localStorage`, so creators can adapt the app to their own channels without creating an account or sending data to a server.
 
 ## Available Scripts
 
