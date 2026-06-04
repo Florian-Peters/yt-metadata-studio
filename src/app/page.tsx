@@ -3,11 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { CopyButton } from "@/components/CopyButton";
 import { CustomPresetForm } from "@/components/CustomPresetForm";
+import { GenerationHistory } from "@/components/GenerationHistory";
 import { MetadataForm } from "@/components/MetadataForm";
 import { MetadataScoreCard } from "@/components/MetadataScoreCard";
 import { OutputCard } from "@/components/OutputCard";
 import { createCustomPreset, getPresetById, presets as builtInPresets, type CustomPresetInput, type Preset, type PresetId } from "@/data/presets";
 import { downloadTextFile, formatMetadataAsMarkdown, formatMetadataAsText, metadataFilename } from "@/lib/exportMetadata";
+import {
+  addHistoryItem,
+  createHistoryItem,
+  generationHistoryStorageKey,
+  type GenerationHistoryItem,
+} from "@/lib/generationHistory";
 import { generateMetadata, type GeneratedMetadata, type MetadataFormValues } from "@/lib/generateMetadata";
 import { scoreMetadata } from "@/lib/scoreMetadata";
 
@@ -50,22 +57,30 @@ export default function Home() {
   const [metadata, setMetadata] = useState<GeneratedMetadata | null>(null);
   const [generatedValues, setGeneratedValues] = useState<MetadataFormValues>(initialValues);
   const [customPresets, setCustomPresets] = useState<Preset[]>([]);
+  const [history, setHistory] = useState<GenerationHistoryItem[]>([]);
   const allPresets = useMemo(() => [...builtInPresets, ...customPresets], [customPresets]);
   const selectedPreset = useMemo(() => getPresetById(values.presetId, allPresets), [allPresets, values.presetId]);
   const metadataScore = useMemo(() => (metadata ? scoreMetadata(metadata, generatedValues) : null), [generatedValues, metadata]);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(customPresetsStorageKey);
+    const savedPresets = window.localStorage.getItem(customPresetsStorageKey);
+    const savedHistory = window.localStorage.getItem(generationHistoryStorageKey);
 
-    if (!saved) {
-      return;
+    if (savedPresets) {
+      try {
+        const parsed = JSON.parse(savedPresets) as Preset[];
+        setCustomPresets(parsed.filter((preset) => preset.source === "custom"));
+      } catch {
+        window.localStorage.removeItem(customPresetsStorageKey);
+      }
     }
 
-    try {
-      const parsed = JSON.parse(saved) as Preset[];
-      setCustomPresets(parsed.filter((preset) => preset.source === "custom"));
-    } catch {
-      window.localStorage.removeItem(customPresetsStorageKey);
+    if (savedHistory) {
+      try {
+        setHistory(JSON.parse(savedHistory) as GenerationHistoryItem[]);
+      } catch {
+        window.localStorage.removeItem(generationHistoryStorageKey);
+      }
     }
   }, []);
 
@@ -73,13 +88,46 @@ export default function Home() {
     const next = generateMetadata(values, variant, allPresets);
     setMetadata(next);
     setGeneratedValues(values);
+    saveHistoryItem(values, next);
   }
 
   function handleRegenerate() {
     const nextVariant = variant + 1;
     setVariant(nextVariant);
-    setMetadata(generateMetadata(values, nextVariant, allPresets));
+    const next = generateMetadata(values, nextVariant, allPresets);
+    setMetadata(next);
     setGeneratedValues(values);
+    saveHistoryItem(values, next);
+  }
+
+  function saveHistoryItem(itemValues: MetadataFormValues, itemMetadata: GeneratedMetadata) {
+    setHistory((current) => {
+      const next = addHistoryItem(current, createHistoryItem(itemValues, itemMetadata));
+      window.localStorage.setItem(generationHistoryStorageKey, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  function handleRestoreHistory(item: GenerationHistoryItem) {
+    const presetExists = allPresets.some((preset) => preset.id === item.values.presetId);
+    const restoredValues = presetExists ? item.values : { ...item.values, presetId: "generic-creator" as const };
+
+    setValues(restoredValues);
+    setGeneratedValues(restoredValues);
+    setMetadata(item.metadata);
+  }
+
+  function handleDeleteHistory(id: string) {
+    setHistory((current) => {
+      const next = current.filter((item) => item.id !== id);
+      window.localStorage.setItem(generationHistoryStorageKey, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  function handleClearHistory() {
+    setHistory([]);
+    window.localStorage.removeItem(generationHistoryStorageKey);
   }
 
   function handleCreateCustomPreset(input: CustomPresetInput) {
@@ -160,6 +208,14 @@ export default function Home() {
             />
             <div className="mt-6">
               <CustomPresetForm onCreate={handleCreateCustomPreset} />
+            </div>
+            <div className="mt-6">
+              <GenerationHistory
+                items={history}
+                onRestore={handleRestoreHistory}
+                onDelete={handleDeleteHistory}
+                onClear={handleClearHistory}
+              />
             </div>
           </aside>
 

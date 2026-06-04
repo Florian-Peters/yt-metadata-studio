@@ -30,6 +30,8 @@ Local-first YouTube metadata generator for creators, music projects, Shorts and 
 - Copy individual output blocks or copy the complete metadata pack
 - Export the current metadata pack as `.txt` or `.md`
 - Show a simple local Metadata Score with improvement tips
+- Keep the latest 10 generated metadata packs in local browser history
+- Restore or delete previous generations without an account
 - Regenerate alternate wording without changing the input
 - Fully local-first MVP: no backend, database, authentication or external generation API
 - Responsive dashboard layout for desktop and mobile
@@ -129,6 +131,7 @@ http://localhost:3000
 6. Review the Metadata Score and improvement tips.
 7. Copy sections, use **Copy All**, or export as TXT/Markdown.
 8. Click **Regenerate** for another wording pass.
+9. Restore a recent metadata pack from local generation history when needed.
 
 All generation is template-based and local. The app does not send prompts, titles, custom presets or generated metadata to external services.
 
@@ -171,7 +174,7 @@ src/
 
 ## Roadmap
 
-- Save named generation history
+- Add names and search to generation history
 - Add preset import/export
 - Add thumbnail prompt generator
 - Add optional OpenAI API support

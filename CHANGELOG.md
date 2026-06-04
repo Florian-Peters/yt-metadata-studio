@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added local generation history for the latest 10 metadata packs
+- Added restore, delete and clear actions for recent generations
+
 ## 0.2.1
 
 This release improves the built-in preset system and makes the app more useful for the general public.
